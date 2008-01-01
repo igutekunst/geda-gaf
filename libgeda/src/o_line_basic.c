@@ -124,6 +124,7 @@ OBJECT *o_line_add(TOPLEVEL *w_current, OBJECT *object_list,
 OBJECT *o_line_copy(TOPLEVEL *w_current, OBJECT *list_tail, OBJECT *o_current)
 {
   OBJECT *new_obj;
+  ATTRIB *a_current;
   int color;
 
   if (o_current->saved_color == -1) {
@@ -169,8 +170,17 @@ OBJECT *o_line_copy(TOPLEVEL *w_current, OBJECT *list_tail, OBJECT *o_current)
   o_line_recalc(w_current, o_current);
   
   /* new_obj->attribute = 0;*/
-  o_attrib_list_copied_to (o_current->attribs, new_obj);
-
+  a_current = o_current->attribs;
+  if (a_current) {
+    while ( a_current ) {
+      /* head attrib node has prev = NULL */
+      if (a_current->prev != NULL) {
+	a_current->copied_to = new_obj;
+      }
+      a_current = a_current->next;
+    }
+  }
+  
   /* return the new tail of the object list */
   return(new_obj);
 }
