@@ -383,6 +383,8 @@ struct st_page {
 
   int pid;
 
+  TOPLEVEL *toplevel;
+
   GList *_object_list;
   SELECTION *selection_list; /* new selection mechanism */
   GList *place_list;

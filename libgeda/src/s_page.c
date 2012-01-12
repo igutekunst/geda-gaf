@@ -121,7 +121,7 @@ PAGE *s_page_new (TOPLEVEL *toplevel, const gchar *filename)
   page = (PAGE*)g_new0 (PAGE, 1);
 
   page->pid = global_pid++;
-
+  page->toplevel = toplevel;
   page->CHANGED = 0;
 
   /* big assumption here that page_filename isn't null */
