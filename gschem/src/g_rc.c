@@ -58,38 +58,54 @@ void g_rc_parse_gtkrc()
   g_free (filename);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
+/*! \brief Verify the version of the RC file under evaluation.
  *  \par Function Description
  *
+ *  Implements the Scheme function "gschem-version". Tests the version
+ *  string in the argument against the version of the application
+ *  itself.
+ *
+ *  \param [in] scm_version Scheme object containing RC file version string
+ *
+ *  \returns #t if the version of the RC file matches the application,
+ *           else #f.
  */
 SCM g_rc_gschem_version(SCM scm_version)
 {
   SCM ret;
   char *version;
+  SCM rc_filename;
+  char *sourcefile;
   
   SCM_ASSERT (scm_is_string (scm_version), scm_version,
               SCM_ARG1, "gschem-version");
 
+  scm_dynwind_begin (0);
   version = scm_to_utf8_string (scm_version);
+  scm_dynwind_free (version);
+
   if (g_strcasecmp (version, PACKAGE_DATE_VERSION) != 0) {
+    sourcefile = NULL;
+    rc_filename = g_rc_rc_filename ();
+    sourcefile = scm_to_utf8_string (rc_filename);
+    scm_dynwind_free (sourcefile);
     fprintf(stderr,
             "You are running gEDA/gaf version [%s%s.%s],\n",
             PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
             PACKAGE_DATE_VERSION);
     fprintf(stderr,
             "but you have a version [%s] gschemrc file:\n[%s]\n",
-            version, rc_filename);
+            version, sourcefile);
     fprintf(stderr,
             "Please be sure that you have the latest rc file.\n");
     ret = SCM_BOOL_F;
   } else {
     ret = SCM_BOOL_T;
   }
-
-  free(version);
+  scm_dynwind_end();
   return ret;
 }
+
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -594,9 +610,9 @@ SCM g_rc_paper_sizes(SCM scm_papername, SCM scm_width, SCM scm_height)
   SCM_ASSERT (SCM_NIMP (scm_height) && SCM_REALP (scm_height), scm_height,
               SCM_ARG3, FUNC_NAME);
 
-  papername = scm_to_utf8_string (scm_papername);
   width  = (int) (scm_to_double (scm_width)  * MILS_PER_INCH);
   height = (int) (scm_to_double (scm_height) * MILS_PER_INCH);
+  papername = scm_to_utf8_string (scm_papername);
 
   if (!s_papersizes_uniq(papername)) {
     ret = SCM_BOOL_F;

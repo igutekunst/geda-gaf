@@ -5,10 +5,13 @@ nobase_dist_scmdata_DATA = geda.scm color-map.scm \
 	geda/os.scm geda/config.scm
 nobase_scmdata_DATA = geda/core/gettext.scm
 
+check-am: update-gaf-tool
+
 # Unit test support.  The unit tests are run using the geda-batch
 # program, with config loading disabled (-q) so that user config
 # already on the system can't interfere with the test process.
-TESTS_ENVIRONMENT = $(builddir)/../shell/geda-shell -q -L $(srcdir) -L $(builddir) \
+GAF_SHELL = $(top_builddir)/gaf/gaf --no-rcfiles shell
+TESTS_ENVIRONMENT = $(GAF_SHELL) -L $(srcdir) -L $(builddir) \
 	-c '(use-modules (unit-test)) (load (list-ref (command-line) 1)) (exit (if (tests-passed?) 0 1))'
 
 TESTS = unit-tests/t0001-geda-conf-lib.scm \
@@ -29,6 +32,10 @@ TESTS = unit-tests/t0001-geda-conf-lib.scm \
 	unit-tests/t0201-page-dirty.scm \
 	unit-tests/t0202-page-string.scm \
 	unit-tests/t0203-page-string-syntax.scm \
+	unit-tests/t0204-page-parse-ordering.scm \
+	unit-tests/t0205-page-parse-unterminated-attribute-list.scm \
+	unit-tests/t0206-page-parse-garbage-attribute.scm \
+	unit-tests/t0207-page-parse-line-endings.scm \
 	unit-tests/t0300-attribute.scm \
 	unit-tests/t0301-promotable-attributes.scm \
 	unit-tests/t0400-os.scm \
@@ -37,7 +44,6 @@ TESTS = unit-tests/t0001-geda-conf-lib.scm \
 	unit-tests/t1000-deprecated.scm
 
 XFAIL_TESTS = \
-	unit-tests/t0203-page-string-syntax.scm \
 	unit-tests/t0301-promotable-attributes.scm
 
 dist_noinst_DATA = geda/core/gettext.scm.in unit-test.scm $(TESTS)
@@ -51,6 +57,11 @@ geda/core/gettext.scm: $(srcdir)/geda/core/gettext.scm.in Makefile
 	else \
 	  echo "Recreating $@"; mv $@.new $@; \
 	fi
+
+update-gaf-tool:
+	cd $(top_builddir)/gaf && $(MAKE) $(AM_MAKEFLAGS) all
+
+.PHONY: update-gaf-tool
 
 MOSTLYCLEANFILES = *.log *~
 CLEANFILES = *.log *~ geda/core/gettext.scm

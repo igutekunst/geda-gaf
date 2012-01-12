@@ -181,7 +181,9 @@ void o_select_object(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
     o_attrib_deselect_invisible (w_current,
                                  toplevel->page_current->selection_list,
                                  o_current);
-  } else {
+  /* Don't select attributes if the type is MULTIPLE, as this causes
+   * issues with invert selection (CONTROLKEY pressed). */
+  } else if( type != MULTIPLE) {
     o_attrib_add_selected (w_current, toplevel->page_current->selection_list,
                            o_current);
   }
@@ -284,6 +286,7 @@ void o_select_box_search(GSCHEM_TOPLEVEL *w_current)
   OBJECT *o_current=NULL;
   int count = 0; /* object count */
   int SHIFTKEY = w_current->SHIFTKEY;
+  int CONTROLKEY = w_current->CONTROLKEY;
   int left, right, top, bottom;
   const GList *iter;
 	
@@ -311,9 +314,9 @@ void o_select_box_search(GSCHEM_TOPLEVEL *w_current)
   }
 
   /* if there were no objects to be found in select box, count will be */
-  /* zero, and you need to deselect anything remaining (unless the shift */
-  /* key was pressed */
-  if (count == 0 && !SHIFTKEY) {
+  /* zero, and you need to deselect anything remaining (except when the */
+  /* shift or control keys are pressed) */
+  if (count == 0 && !SHIFTKEY && !CONTROLKEY) {
     o_select_unselect_all (w_current);
   }
   i_update_menus(w_current);

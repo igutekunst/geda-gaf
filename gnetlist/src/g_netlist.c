@@ -320,105 +320,98 @@ SCM g_get_all_connections(SCM scm_netname)
 /*  (netname (uref pin) (uref pin) ... ) */
 SCM g_get_nets(SCM scm_uref, SCM scm_pin)
 {
-    SCM outerlist = SCM_EOL;
-    SCM pinslist = SCM_EOL;
-    SCM pairlist = SCM_EOL;
-    NETLIST *nl_current = NULL;
-    CPINLIST *pl_current = NULL;
-    NET *n_current;
-    char *wanted_uref = NULL;
-    char *wanted_pin = NULL;
-    char *net_name = NULL;
+  SCM outerlist = SCM_EOL;
+  SCM pinslist = SCM_EOL;
+  SCM pairlist = SCM_EOL;
+  NETLIST *nl_current = NULL;
+  CPINLIST *pl_current = NULL;
+  NET *n_current;
+  char *wanted_uref = NULL;
+  char *wanted_pin = NULL;
+  char *net_name = NULL;
 
-    char *pin;
-    char *uref;
+  char *pin;
+  char *uref;
 
-    SCM_ASSERT(scm_is_string (scm_uref), scm_uref, SCM_ARG1, 
-	       "gnetlist:get-nets");
+  SCM_ASSERT(scm_is_string (scm_uref), scm_uref, SCM_ARG1, 
+             "gnetlist:get-nets");
 
-    SCM_ASSERT(scm_is_string (scm_pin), scm_pin, SCM_ARG2, 
-	       "gnetlist:get-nets");
+  SCM_ASSERT(scm_is_string (scm_pin), scm_pin, SCM_ARG2, 
+             "gnetlist:get-nets");
 
-    scm_dynwind_begin (0);
+  scm_dynwind_begin (0);
 
-    wanted_uref = scm_to_utf8_string (scm_uref);
-    scm_dynwind_free (wanted_uref);
+  wanted_uref = scm_to_utf8_string (scm_uref);
+  scm_dynwind_free (wanted_uref);
 
-    wanted_pin = scm_to_utf8_string (scm_pin);
-    scm_dynwind_free (wanted_pin);
+  wanted_pin = scm_to_utf8_string (scm_pin);
+  scm_dynwind_free (wanted_pin);
 
-    nl_current = netlist_head;
+  nl_current = netlist_head;
 
-    /* search for the first instance */
-    /* through the entire list */
-    while (nl_current != NULL) {
+  /* search for the first instance */
+  /* through the entire list */
+  for (nl_current = netlist_head;
+       nl_current != NULL;
+       nl_current = nl_current->next) {
 
-	if (nl_current->component_uref) {
+    if (!nl_current->component_uref) continue;
+    if (strcmp (nl_current->component_uref, wanted_uref) != 0) continue;
 
-	    if (strcmp(nl_current->component_uref, wanted_uref) == 0) {
+    for (pl_current = nl_current->cpins;
+         pl_current != NULL;
+         pl_current = pl_current->next) {
 
-		pl_current = nl_current->cpins;
-		while (pl_current != NULL) {
+      if (!pl_current->pin_number) continue;
+      if (strcmp(pl_current->pin_number, wanted_pin) != 0) continue;
 
-		    if (pl_current->pin_number) {
-			if (strcmp(pl_current->pin_number, wanted_pin) ==
-			    0) {
+      if (pl_current->net_name) {
+        net_name = pl_current->net_name;
+      }
 
-			    n_current = pl_current->nets;
+      for (n_current = pl_current->nets;
+           n_current != NULL;
+           n_current = n_current->next) {
 
-			    if (pl_current->net_name) {
-				net_name = pl_current->net_name;
-			    }
+        if (!n_current->connected_to) continue;
 
-			    while (n_current != NULL) {
+        pairlist = SCM_EOL;
+        pin = (char *) g_malloc(sizeof(char) *
+                                strlen
+                                (n_current->
+                                 connected_to));
+        uref =
+          (char *) g_malloc(sizeof(char) *
+                            strlen(n_current->
+                                   connected_to));
 
-				if (n_current->connected_to) {
+        sscanf(n_current->connected_to,
+               "%s %s", uref, pin);
 
-				    pairlist = SCM_EOL;
-				    pin = (char *) g_malloc(sizeof(char) *
-							  strlen
-							  (n_current->
-							   connected_to));
-				    uref =
-					(char *) g_malloc(sizeof(char) *
-							strlen(n_current->
-							       connected_to));
+        pairlist = scm_list_n (scm_from_utf8_string (uref),
+                               scm_from_utf8_string (pin),
+                               SCM_UNDEFINED);
 
-				    sscanf(n_current->connected_to,
-					   "%s %s", uref, pin);
+        pinslist = scm_cons (pairlist, pinslist);
 
-				    pairlist = scm_list_n (scm_from_utf8_string (uref),
-                                           scm_from_utf8_string (pin),
-                                           SCM_UNDEFINED);
-
-				    pinslist = scm_cons (pairlist, pinslist);
-
-				    g_free(uref);
-				    g_free(pin);
-				}
-				n_current = n_current->next;
-			    }
-			}
-		    }
-		    pl_current = pl_current->next;
-		}
-	    }
-	}
-	nl_current = nl_current->next;
+        g_free(uref);
+        g_free(pin);
+      }
     }
+  }
 
-    if (net_name != NULL) {
-      outerlist = scm_cons (scm_from_utf8_string (net_name), pinslist);
-    } else {
-      outerlist = scm_cons (scm_from_utf8_string ("ERROR_INVALID_PIN"),
-                            outerlist);
-	fprintf(stderr, "Invalid wanted_pin passed to get-nets [%s]\n",
-		wanted_pin);
-    }
+  if (net_name != NULL) {
+    outerlist = scm_cons (scm_from_utf8_string (net_name), pinslist);
+  } else {
+    outerlist = scm_cons (scm_from_utf8_string ("ERROR_INVALID_PIN"),
+                          outerlist);
+    fprintf(stderr, "Invalid refdes ('%s') and pin ('%s') passed to get-nets\n",
+            wanted_uref, wanted_pin);
+  }
 
-    scm_dynwind_end ();
+  scm_dynwind_end ();
 
-    return (outerlist);
+  return (outerlist);
 }
 
 

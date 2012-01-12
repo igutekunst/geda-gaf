@@ -182,6 +182,13 @@ void s_cue_output_lowlevel(TOPLEVEL * toplevel, OBJECT * object, int whichone,
             s_cue_postscript_junction (toplevel, fp, x, y, bus_involved);
         }
       }
+      else if (object->type == OBJ_PIN
+               && count == 0
+               && whichone == object->whichend) {
+        if (output_type == POSTSCRIPT) {
+          s_cue_postscript_fillbox(toplevel, fp, x, y);
+        }
+      }
       break;
 
     case (CONN_MIDPOINT):
@@ -249,8 +256,12 @@ void s_cue_output_single(TOPLEVEL * toplevel, OBJECT * object, FILE * fp,
 	return;
       }
 
-  s_cue_output_lowlevel(toplevel, object, 0, fp, type);
-  s_cue_output_lowlevel(toplevel, object, 1, fp, type);
+  if (object->type != OBJ_NET
+      || ((object->type == OBJ_NET)
+          && !o_net_is_fully_connected (toplevel, object))) {
+    s_cue_output_lowlevel(toplevel, object, 0, fp, type);
+    s_cue_output_lowlevel(toplevel, object, 1, fp, type);
+  }
   s_cue_output_lowlevel_midpoints(toplevel, object, fp, type);
 }
 

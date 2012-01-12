@@ -34,10 +34,43 @@
 #include <dmalloc.h>
 #endif
 
-/*! \todo Finish function documentation!!!
- *  \brief
+static GList *new_toplevel_hooks = NULL;
+
+typedef struct {
+  NewToplevelFunc func;
+  void *data;
+} NewToplevelHook;
+
+
+void s_toplevel_append_new_hook (NewToplevelFunc func, void *data)
+{
+  NewToplevelHook *new_hook;
+
+  new_hook = g_new0 (NewToplevelHook, 1);
+  new_hook->func = func;
+  new_hook->data = data;
+
+  new_toplevel_hooks = g_list_append (new_toplevel_hooks, new_hook);
+}
+
+
+static void call_new_toplevel_hook (gpointer hook, gpointer toplevel)
+{
+  NewToplevelHook *h = (NewToplevelHook*) hook;
+  TOPLEVEL *t = (TOPLEVEL*) toplevel;
+
+  h->func (t, h->data);
+}
+
+/*!
+ *  \brief Create a TOPLEVEL object
  *  \par Function Description
+ *  Create and return an empty TOPLEVEL object with sensible defaults
+ *  for its properties.
  *
+ *  \returns the newly created TOPLEVEL.
+ *
+ *  \todo rethink block below that is set in gschem but used in libgeda.
  */
 TOPLEVEL *s_toplevel_new (void)
 {
@@ -135,6 +168,10 @@ TOPLEVEL *s_toplevel_new (void)
 
   toplevel->change_notify_funcs = NULL;
 
+  toplevel->attribs_changed_hooks = NULL;
+
+  toplevel->conns_changed_hooks = NULL;
+
   toplevel->load_newer_backup_func = NULL;
   toplevel->load_newer_backup_data = NULL;
 
@@ -143,6 +180,10 @@ TOPLEVEL *s_toplevel_new (void)
   toplevel->auto_save_timeout = 0;
 
   toplevel->weak_refs = NULL;
+
+  /* Call hooks */
+  g_list_foreach (new_toplevel_hooks, call_new_toplevel_hook, toplevel);
+
   return toplevel;
 }
 

@@ -125,13 +125,12 @@ static void draw_junction_cue (GSCHEM_TOPLEVEL *w_current,
  */
 void o_cue_draw_lowlevel(GSCHEM_TOPLEVEL *w_current, OBJECT *object, int whichone)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int x, y;
   GList *cl_current;
   CONN *conn;
   int type, count = 0;
   int done = FALSE;
-  int size, pinsize;
+  int size;
   int otherone;
   int bus_involved=FALSE;
 
@@ -199,38 +198,10 @@ void o_cue_draw_lowlevel(GSCHEM_TOPLEVEL *w_current, OBJECT *object, int whichon
 
           otherone = !whichone;
 
-          pinsize = 0;
-          if (toplevel->pin_style == THICK )
-            pinsize = object->line_width;
-
           o_cue_set_color (w_current, NET_ENDPOINT_COLOR);
-          if (object->line->y[whichone] == object->line->y[otherone]) {
-            /* horizontal line */
-            if (object->line->x[whichone] <= object->line->x[otherone]) {
-              gschem_cairo_line (w_current, END_NONE, pinsize, x,        y,
-                                 x + size, y);
-            } else {
-              gschem_cairo_line (w_current, END_NONE, pinsize, x,        y,
-                                 x - size, y);
-            }
-            gschem_cairo_stroke (w_current, TYPE_SOLID,
-                                 END_NONE, pinsize, -1, -1);
-          } else if (object->line->x[0] == object->line->x[1]) {
-            /* vertical line */
-            if (object->line->y[whichone] <= object->line->y[otherone]) {
-                gschem_cairo_line (w_current, END_NONE, pinsize, x, y,
-                                   x, y + size);
-            } else {
-              gschem_cairo_line (w_current, END_NONE, pinsize, x, y,
-                                 x, y - size);
-            }
-            gschem_cairo_stroke (w_current, TYPE_SOLID,
-                                 END_NONE, pinsize, -1, -1);
-          } else {
-            /* angled line */
-            /* not supporting rendering of que for angled pin for now. hack */
-          }
-
+          gschem_cairo_center_box (w_current, -1, -1, x, y, size, size);
+          o_cue_set_color (w_current, NET_ENDPOINT_COLOR);
+          cairo_fill (w_current->cr);
         }
       }
       break;
@@ -286,8 +257,12 @@ void o_cue_draw_single(GSCHEM_TOPLEVEL *w_current, OBJECT *object)
       }
 
   if (object->type != OBJ_PIN) {
-    o_cue_draw_lowlevel(w_current, object, 0);
-    o_cue_draw_lowlevel(w_current, object, 1);
+    if (object->type != OBJ_NET
+        || ((object->type == OBJ_NET)
+            && !o_net_is_fully_connected (w_current->toplevel, object))) {
+      o_cue_draw_lowlevel(w_current, object, 0);
+      o_cue_draw_lowlevel(w_current, object, 1);
+    }
     o_cue_draw_lowlevel_midpoints(w_current, object);
   } else {
     o_cue_draw_lowlevel(w_current, object, object->whichend);
