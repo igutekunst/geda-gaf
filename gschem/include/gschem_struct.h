@@ -113,6 +113,12 @@ struct st_gschem_toplevel {
   /* ------------------ */
   GList *stretch_list;
 
+  /* -------------- */
+  /* Printing state */
+  /* -------------- */
+  GtkPageSetup *page_setup;
+  GtkPrintSettings *print_settings;
+
   /* --------------------- */
   /* Gschem internal state */
   /* --------------------- */

@@ -154,6 +154,7 @@ static struct gsubr_t gschem_funcs[] = {
   { "file-save",                 0, 0, 0, g_keys_file_save },
   { "file-save-as",              0, 0, 0, g_keys_file_save_as },
   { "file-save-all",             0, 0, 0, g_keys_file_save_all },
+  { "file-page-setup",           0, 0, 0, g_keys_file_page_setup },
   { "file-print",                0, 0, 0, g_keys_file_print },
   { "file-image",                0, 0, 0, g_keys_file_write_png },
   { "file-close-window",         0, 0, 0, g_keys_file_close },

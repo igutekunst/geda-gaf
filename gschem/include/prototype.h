@@ -47,6 +47,7 @@ SCM g_keys_file_script(SCM rest);
 SCM g_keys_file_save(SCM rest);
 SCM g_keys_file_save_as(SCM rest);
 SCM g_keys_file_save_all(SCM rest);
+SCM g_keys_file_page_setup(SCM rest);
 SCM g_keys_file_print(SCM rest);
 SCM g_keys_file_write_png(SCM rest);
 SCM g_keys_file_close(SCM rest);
@@ -300,6 +301,7 @@ void i_callback_file_save(gpointer data, guint callback_action, GtkWidget *widge
 void i_callback_toolbar_file_save(GtkWidget *widget, gpointer data);
 void i_callback_file_save_all(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_file_save_as(gpointer data, guint callback_action, GtkWidget *widget);
+void i_callback_file_page_setup(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_file_print(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_file_write_png(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_file_close(gpointer data, guint callback_action, GtkWidget *widget);
@@ -780,6 +782,7 @@ void x_pagesel_close (GSCHEM_TOPLEVEL *w_current);
 void x_pagesel_update (GSCHEM_TOPLEVEL *w_current);
 /* x_preview.c */
 /* x_print.c */
+void x_print_page_setup (GSCHEM_TOPLEVEL *w_current);
 void x_print (GSCHEM_TOPLEVEL *w_current);
 /* x_rc.c */
 void x_rc_parse_gschem (GSCHEM_TOPLEVEL *w_current, const gchar *rcfile);

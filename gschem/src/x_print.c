@@ -155,9 +155,19 @@ x_print_draw_page (GtkPrintOperation *print,
 }
 
 void
+x_print_page_setup (GSCHEM_TOPLEVEL *w_current)
+{
+  GtkPageSetup *new_setup;
+  new_setup = gtk_print_run_page_setup_dialog (GTK_WINDOW (w_current->main_window),
+                                               w_current->page_setup,
+                                               w_current->print_settings);
+  g_object_unref (w_current->page_setup);
+  w_current->page_setup = new_setup;
+}
+
+void
 x_print (GSCHEM_TOPLEVEL *w_current)
 {
-  static GtkPrintSettings *settings = NULL;
   GtkPrintOperation *print;
   GtkPrintOperationResult res;
   GError *err = NULL;
@@ -168,11 +178,10 @@ x_print (GSCHEM_TOPLEVEL *w_current)
                         "n-pages", num_pages,
                         "use-full-page", FALSE,
                         "unit", GTK_UNIT_POINTS,
+                        "default-page-setup", w_current->page_setup,
                         NULL);
 
-  if (settings != NULL) {
-    gtk_print_operation_set_print_settings (print, settings);
-  }
+  gtk_print_operation_set_print_settings (print, w_current->print_settings);
 
   g_signal_connect (print, "draw_page", G_CALLBACK (x_print_draw_page),
                     w_current);
@@ -196,10 +205,9 @@ x_print (GSCHEM_TOPLEVEL *w_current)
 
   } else if (res == GTK_PRINT_OPERATION_RESULT_APPLY) {
     /* We're supposed to store the print settings, so do that */
-    if (settings != NULL) {
-      g_object_unref (settings);
-    }
-    settings = g_object_ref (gtk_print_operation_get_print_settings (print));
+    g_object_unref (w_current->print_settings);
+    w_current->print_settings =
+      g_object_ref (gtk_print_operation_get_print_settings (print));
   }
 
   /* Clean up */

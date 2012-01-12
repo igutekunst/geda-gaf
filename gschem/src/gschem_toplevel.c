@@ -120,6 +120,12 @@ GSCHEM_TOPLEVEL *gschem_toplevel_new ()
   w_current->which_grip = -1;
   w_current->which_object = NULL;
 
+  /* -------------- */
+  /* Printing state */
+  /* -------------- */
+  w_current->page_setup = gtk_page_setup_new ();
+  w_current->print_settings = gtk_print_settings_new ();
+
   /* ------------------ */
   /* Rubberbanding nets */
   /* ------------------ */

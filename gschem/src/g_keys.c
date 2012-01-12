@@ -71,6 +71,7 @@ DEFINE_G_KEYS(file_script)
 DEFINE_G_KEYS(file_save)
 DEFINE_G_KEYS(file_save_as)
 DEFINE_G_KEYS(file_save_all)
+DEFINE_G_KEYS(file_page_setup)
 DEFINE_G_KEYS(file_print)
 DEFINE_G_KEYS(file_write_png)
 

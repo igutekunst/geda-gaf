@@ -262,10 +262,20 @@ DEFINE_I_CALLBACK(file_save_as)
   x_fileselect_save (w_current);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
+/*! \brief Show the page setup dialog.
+ * \par Function Description
+ * Displays the page setup dialog for setting page size & layout for
+ * printing.
+ */
+DEFINE_I_CALLBACK(file_page_setup)
+{
+  GSCHEM_TOPLEVEL *w_current = (GSCHEM_TOPLEVEL*) data;
+  x_print_page_setup (w_current);
+}
+
+/*! \brief Show the print dialog
+ * \par Function Description
+ * Displays the print dialog for printing schematics or symbols.
  */
 DEFINE_I_CALLBACK(file_print)
 {
