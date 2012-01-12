@@ -1031,8 +1031,6 @@ SCM g_rc_make_backup_files(SCM mode)
                   2);
 }
 
-extern COLOR print_colors[MAX_COLORS];
-
 SCM g_rc_print_color_map (SCM scm_map)
 {
   if (scm_map == SCM_UNDEFINED) {
