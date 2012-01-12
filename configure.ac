@@ -185,6 +185,8 @@ AC_CONFIG_FILES([Makefile
                  libgeda/share/Makefile
                  libgeda/src/Makefile
 
+                 gaf/Makefile
+
                  gschem/Makefile
                  gschem/po/Makefile.in
                  gschem/docs/Makefile
