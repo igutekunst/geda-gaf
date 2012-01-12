@@ -780,7 +780,7 @@ void x_pagesel_close (GSCHEM_TOPLEVEL *w_current);
 void x_pagesel_update (GSCHEM_TOPLEVEL *w_current);
 /* x_preview.c */
 /* x_print.c */
-void x_print_setup(GSCHEM_TOPLEVEL *w_current, char *filename);
+void x_print (GSCHEM_TOPLEVEL *w_current);
 /* x_rc.c */
 void x_rc_parse_gschem (GSCHEM_TOPLEVEL *w_current, const gchar *rcfile);
 /* x_script.c */
