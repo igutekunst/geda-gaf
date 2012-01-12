@@ -1,18 +1,23 @@
-noinst_PROGRAMS = geda-shell
+SUBDIRS = po
 
-BUILT_SOURCES = \
-	shell.x
+bin_PROGRAMS = gaf
 
-geda_shell_SOURCES = shell.c
+BUILT_SOURCES = shell.x
 
-geda_shell_CPPFLAGS = \
-	-I$(srcdir)/../include -I$(top_srcdir) -I$(includedir) \
+gaf_SOURCES = \
+	builtins.h \
+	gettext.h \
+	gaf.c \
+	shell.c
+
+gaf_CPPFLAGS = \
+	-I$(top_srcdir) -I$(top_srcdir)/libgeda/include -I$(includedir) \
 	-I$(top_srcdir)/intl
-geda_shell_CFLAGS = \
+gaf_CFLAGS = \
 	$(GCC_CFLAGS) $(MINGW_CFLAGS) $(GUILE_CFLAGS) $(GLIB_CFLAGS) \
 	$(GDK_PIXBUF_CFLAGS)
-geda_shell_LDFLAGS = $(GLIB_LIBS) $(GUILE_LIBS) $(GDK_PIXBUF_LIBS)
-geda_shell_LDADD = ../src/libgeda.la @LIBINTL@
+gaf_LDFLAGS = $(GLIB_LIBS) $(GUILE_LIBS) $(GDK_PIXBUF_LIBS)
+gaf_LDADD = $(top_builddir)/libgeda/src/libgeda.la @LIBINTL@
 
 localedir = @datadir@/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
@@ -21,7 +26,7 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 # in C.
 SUFFIXES = .x
 snarf_cpp_opts = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(geda_shell_CPPFLAGS) $(AM_CFLAGS) $(geda_shell_CFLAGS)
+	$(gaf_CPPFLAGS) $(AM_CFLAGS) $(gaf_CFLAGS)
 .c.x:
 	CPP="$(CPP)" $(GUILE_SNARF) -o $@ $< $(snarf_cpp_opts)
 
