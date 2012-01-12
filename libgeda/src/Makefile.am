@@ -82,7 +82,8 @@ libgeda_la_SOURCES = \
 	s_weakref.c \
 	u_basic.c
 
-libgeda_la_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"  $(DATADIR_DEFS) \
+libgeda_la_CPPFLAGS = $(DATADIR_DEFS) \
+	-DLOCALEDIR=\"$(localedir)\" -DG_LOG_DOMAIN=\"libgeda\" \
 	-I$(srcdir)/../include -I$(srcdir)/../include/libgeda -I$(top_srcdir)
 libgeda_la_CFLAGS = \
 	$(GCC_CFLAGS) $(MINGW_CFLAGS) $(GUILE_CFLAGS) $(GLIB_CFLAGS) \
