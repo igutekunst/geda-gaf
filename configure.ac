@@ -78,11 +78,17 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.20.0], ,
 PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.16.0], ,
   AC_MSG_ERROR([GTK+ 2.16.0 or later is required.]))
 
+PKG_CHECK_MODULES(GDK, [gdk-2.0 >= 2.16.0], ,
+  AC_MSG_ERROR([GDK 2.16.0 or later is required.]))
+
 PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= 2.16.0], ,
   AC_MSG_ERROR([GDK_PIXBUF 2.16.0 or later is required.]))
 
 PKG_CHECK_MODULES(CAIRO, [cairo >= 1.8.0], ,
   AC_MSG_ERROR([CAIRO 1.8.0 or later is required.]))
+
+PKG_CHECK_MODULES(PANGO, [pango >= 1.23.0], ,
+  AC_MSG_ERROR([PANGO 1.23.0 or later is required.]))
 
 #####################################################################
 # Header files & particular functions
@@ -163,6 +169,8 @@ AX_DATA_DIRS
 AX_PCB_DIRS
 # Set up libgeda with the correct ld version number
 AX_LIBGEDA([41:0:0])
+# Set up libgedacairo with the correct ld version number
+AX_LIBGEDACAIRO([1:0:0])
 
 #####################################################################
 # Generate output
@@ -184,6 +192,9 @@ AC_CONFIG_FILES([Makefile
                  libgeda/scheme/Makefile
                  libgeda/share/Makefile
                  libgeda/src/Makefile
+
+                 libgedacairo/Makefile
+                 libgedacairo/libgedacairo.pc
 
                  gschem/Makefile
                  gschem/po/Makefile.in
